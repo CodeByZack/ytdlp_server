@@ -21,18 +21,13 @@
 
 ## Docker 构建与运行
 
-### 1. 构建镜像（如需代理，务必加代理参数）
-
-如果你的网络需要代理访问国外源，构建时加如下参数：
+### 1. 构建镜像
 
 ```sh
-docker build \
-  --build-arg http_proxy=http://host.docker.internal:7897 \
-  --build-arg https_proxy=http://host.docker.internal:7897 \
-  -t ytdlp-server .
-```
+docker build -t ytdlp-server .
 
-> 其中 `7897` 为你的本地代理端口，`host.docker.internal` 适用于 macOS/Windows Docker Desktop。
+docker save -o ytdlp-server.tar ytdlp-server:latest
+```
 
 ### 2. 运行容器
 
