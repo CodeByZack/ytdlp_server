@@ -1,5 +1,5 @@
 import pLimit from "p-limit";
-import { nextTask, getTask, updateTask } from "./taskManager.js";
+import { nextTask, getTask, updateTask, getAllTasks } from "./taskManager.js";
 import { downloadVideo, downloadAudio } from "../tools/ytdlp.js";
 
 let running = false;
@@ -23,9 +23,15 @@ export function startWorker(concurrency = 2) {
             let res: unknown;
             if (task.type === "video") res = await downloadVideo(task.url);
             else res = await downloadAudio(task.url);
-            await updateTask(taskId, { status: "completed", result: JSON.stringify(res) });
+            await updateTask(taskId, {
+              status: "completed",
+              result: JSON.stringify(res),
+            });
           } catch (err: any) {
-            await updateTask(taskId, { status: "failed", error: err?.message ?? String(err) });
+            await updateTask(taskId, {
+              status: "failed",
+              error: err?.message ?? String(err),
+            });
           }
         });
         // keep list of active promises to prevent unbounded growth
@@ -46,7 +52,9 @@ export function startWorker(concurrency = 2) {
     }
     // wait for outstanding jobs to finish before resolving loop
     try {
-      await Promise.allSettled((await Promise.resolve(active)) as Promise<unknown>[]);
+      await Promise.allSettled(
+        (await Promise.resolve(active)) as Promise<unknown>[]
+      );
     } catch {
       // ignore
     }
